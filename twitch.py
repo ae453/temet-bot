@@ -12,6 +12,7 @@ client_secret = config["TWITCH_CLIENT_SECRET"]
 broadcaster_name = config["TWITCH_BROADCASTER_NAME"]
 broadcaster_id = config["TWITCH_BROADCASTER_ID"]
 callback_url = config["TWITCH_CALLBACK_URL"]
+webhook_secret = config["TWITCH_WEBHOOK_SECRET"]
 
 
  # Make Request, Return oAuth Keys
@@ -46,7 +47,7 @@ async def main() -> None:
         "transport": {
             "method": "webhook",
             "callback": callback_url,
-            "secret": ""
+            "secret": webhook_secret
         }
     }
     
