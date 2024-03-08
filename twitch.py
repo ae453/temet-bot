@@ -29,7 +29,7 @@ async def get_oauth() -> dict:
 async def main() -> None:
     print("Getting oAuth Token...")
     keys = await get_oauth()
-    oauth_token = f"Bearer {keys["access_token"]}"
+    oauth_token = f"Bearer {keys['access_token']}"
         
     sub_headers: dict = {
         "Authorization": oauth_token,
