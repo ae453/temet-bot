@@ -1,0 +1,14 @@
+wheel
+PyNaCl
+discord.py
+discord.py[voice]
+pytz
+jishaku
+pytest
+flake8
+pylint
+python-dotenv
+chat-exporter
+discord-rich-presence
+requests
+websockets
