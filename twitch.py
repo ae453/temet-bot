@@ -55,9 +55,13 @@ async def main() -> None:
     
     sub_r = requests.post('https://api.twitch.tv/helix/eventsub/subscriptions', headers=sub_headers, data=dumps(sub_body))
     sub_r_data = sub_r.json()
-    
-    if sub_r_data["status"] in [400, 401]:
-        print(f'Error Received from Server: {sub_r_data["error"]}. {sub_r_data["message"]}')
+
+    try:
+        if sub_r_data["status"] in [400, 401]:
+            print(f'Error Received from Server: {sub_r_data["error"]}. {sub_r_data["message"]}')
+    except KeyError as e:
+        if not sub_r_data:
+            print(f"No Status Received from Server. {e}")
     
     print(f"\n\n{sub_r_data}")
     
