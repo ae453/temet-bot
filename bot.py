@@ -6,12 +6,9 @@ import time
 
 import colorama
 import discord
-import jishaku
 from discord import app_commands, ui
 from discord.ext import commands, tasks
 from discord.ui import Button, View
-from discord.utils import get
-from discordrp import Presence
 from dotenv import dotenv_values
 
 from embed_generator import embed_generator
@@ -58,6 +55,11 @@ class Client(commands.Bot):
     def __init__(self):
         super().__init__(command_prefix=commands.when_mentioned_or(config["BOT_PREFIX"]), case_insensitive=True, intents=discord.Intents.all())
         self.cogs_list = ['jishaku']
+        
+    async def is_owner(self, user: discord.User):
+        if user.id in []:
+            return True
+        return await super().is_owner(user)
 
     async def setup_hook(self):
         for ext in self.cogs_list:

@@ -23,15 +23,13 @@ async def get_oauth() -> dict:
         "grant_type": 'client_credentials'
     }
      # Request oAuth Token
+    print("\nGetting oAuth Token...")
     r = requests.post('https://id.twitch.tv/oauth2/token', body)
-    return r.json()
+    return f"Bearer {r.json()['access_token']}"
 
 
-async def main() -> None:
-    print("Getting oAuth Token...")
-    keys = await get_oauth()
-    oauth_token = f"Bearer {keys['access_token']}"
-        
+async def webhook_post(oauth_token: str) -> None:
+    oauth_token = await get_oauth()
     sub_headers: dict = {
         "Authorization": oauth_token,
         "Client-Id": client_id,
@@ -61,10 +59,51 @@ async def main() -> None:
             print(f'Error Received from Server: {sub_r_data["error"]}. {sub_r_data["message"]}')
     except KeyError as e:
         if not sub_r_data:
-            print(f"No Status Received from Server. {e}")
+            print(f"No Response Received from Server. {e}")
     
-    print(f"\n\n{sub_r_data}")
+    print(f"Response Received from Server: \n\n{dumps(sub_r_data, sort_keys=True, indent=4)}")
+
+
+async def webhook_get():
+    oauth_token = await get_oauth() 
+    headers = {
+        "Authorization": oauth_token,
+        "Client-Id": client_id,
+        "Content-Type": "application/json"
+    }
     
+    r = requests.get('https://api.twitch.tv/helix/eventsub/subscriptions', headers=headers)
+    print(dumps(r.json(), sort_keys=True, indent=4))
+
+
+async def webhook_delete():
+    oauth_token = await get_oauth()
+    del_user_input = input("\nWebhook ID: ")
+    headers = {
+        "Authorization": oauth_token,
+        "Client-Id": client_id,
+        "Content-Type": "application/json"
+    }
+    
+    r = requests.delete(f'https://api.twitch.tv/helix/eventsub/subscriptions?id={del_user_input}', headers=headers)
+    
+    try:
+        r_data = r.json()
+        print(f"Server Responded with Status `{r_data["status"]}`: `{r_data["error"]}`")
+    except requests.exceptions.JSONDecodeError:
+        print(r)
+
 if __name__ == "__main__":
-     # Runs all Functions then Subscribes to Websocket
-    asyncio.run(main())
+    while True:
+        print("\n\nDelete - Delete a EventSub Subscription (Requires Webhook ID)\nPost - Subscribe to an EventSub Subscription\nGet - Get all Current EventSub Subscriptions")
+        user_input = input("[D]elete, [P]ost, [G]et? ")
+        match user_input.lower():
+            case "d" | "delete":
+                asyncio.run(webhook_delete())
+                break
+            case "p" | "post":
+                asyncio.run(webhook_post())
+                break
+            case "g" | "get":
+                asyncio.run(webhook_get())
+                break
