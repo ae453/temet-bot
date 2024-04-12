@@ -79,6 +79,10 @@ class Client(commands.Bot):
 client = Client()
 client.remove_command("help")
 
+@client.event
+async def on_error():
+    pass
+
 
 if __name__ == "__main__":
     client.run(token=config["BOT_TOKEN"])
